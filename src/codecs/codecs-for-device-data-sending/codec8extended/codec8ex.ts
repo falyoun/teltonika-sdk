@@ -1,5 +1,5 @@
-import { Codec } from '../codec';
-import { convertBytesToInt, prepareIOEntity, sanitizeGPS } from '../../utils';
+import { Codec } from '../../codec';
+import { convertBytesToInt, prepareIOEntity, sanitizeGPS } from '../../../utils';
 import { Codec8extendedIoElements } from './codec8extended-io-elements';
 
 export class Codec8ex extends Codec {

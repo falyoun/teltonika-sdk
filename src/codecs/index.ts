@@ -1,3 +1,3 @@
 export * from './codec';
-export * from './codec8';
-export * from './codec8extended';
+export * from './codecs-for-device-data-sending/codec8';
+export * from './codecs-for-device-data-sending/codec8extended';
