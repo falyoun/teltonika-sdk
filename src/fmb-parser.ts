@@ -1,6 +1,7 @@
 import * as binutils from 'binutils64';
 import { Codec8, Codec8ex } from './codecs';
 import { convertBytesToInt } from './utils';
+import { Codec12 } from './codecs/codecs-for-communication-over-gprs-messages/codec12/codec12';
 export class FmbParser {
   _reader: any;
   _avlObj: any;
@@ -39,6 +40,7 @@ export class FmbParser {
       number_of_data: convertBytesToInt(this._reader.ReadBytes(1)),
     };
 
+    console.log(this._avlObj);
     this._codecReader = this._reader;
 
     switch (this._avlObj.codec_id) {
@@ -53,6 +55,13 @@ export class FmbParser {
           this._codecReader,
           this._avlObj.number_of_data,
         );
+        break;
+
+      case 12:
+        this._codec = new Codec12(
+          this._codecReader,
+          this._avlObj.number_of_data
+        )
         break;
     }
   }

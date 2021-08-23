@@ -1,4 +1,7 @@
+import { GpsElement } from '../models';
 
+
+export const sanitizeLongLat = (gpsElement: GpsElement, gpsPrecision = 10000000) => sanitizeGPS({ gps: { ...gpsElement } }, gpsPrecision);
 export const sanitizeGPS = (avlRecord, gpsPrecision = 10000000) => {
   try {
     const longitude: number = avlRecord.gps.longitude;
@@ -13,7 +16,7 @@ export const sanitizeGPS = (avlRecord, gpsPrecision = 10000000) => {
     avlRecord.gps.latitude /= gpsPrecision;
     return avlRecord;
   } catch (e) {
-    console.error("sanitizeGPS: ", e);
+    console.error('sanitizeGPS: ', e);
     return avlRecord;
   }
 };
@@ -38,4 +41,4 @@ export const prepareIOEntity = (property_id, value, ioElements: any) => {
     dimension,
     valueHuman,
   };
-}
+};

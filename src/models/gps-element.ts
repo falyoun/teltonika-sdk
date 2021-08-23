@@ -1,10 +1,13 @@
 export class GpsElement {
-  x: number;
-  y: number;
-  altitude: number;
-  angle: number;
-  satellites: number;
-  speed: number;
+  constructor(
+    public longitude,
+    public latitude,
+    public altitude,
+    public angle,
+    public satellites,
+    public speed
+  ) {
+  }
   public static isLatValid(latitude: number) {
     return -90 <= latitude && latitude <= 90;
   }

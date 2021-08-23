@@ -2,11 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { FmbParser } from './fmb-parser';
-import { AvlRecord } from './models';
-import { AvlPacket } from './models/avl-packet';
+import { AvlRecord, AvlPacket} from './models';
 
 
-const testFmbParser = () => {
+const testCodec8 = () => {
   let codec8packet = '000000000000004308020000016B40D57B480100000000000000000000000000000001010101000000000000016B40D5C198010000000000000000000000000000000101010101000000020000252C';
 
   const buff = Buffer.from(codec8packet, 'hex');
@@ -37,6 +36,13 @@ const testFmbParser = () => {
      // avlInstance.print();
   }
 }
+
+
+const testCodec12 = () => {
+  let codec12packet = '000000000000000F0C010500000007676574696E666F0100004312';
+  const buff = Buffer.from(codec12packet, 'hex');
+  const fmbParser = new FmbParser(buff);
+};
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get<ConfigService>(ConfigService);
@@ -48,7 +54,8 @@ async function bootstrap() {
   try {
     await bootstrap();
     console.log('Server is up and running...');
-    testFmbParser();
+    // testCodec8();
+    testCodec12();
   } catch (e) {
     console.error(e);
   }
