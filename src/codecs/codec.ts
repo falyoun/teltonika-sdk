@@ -26,7 +26,7 @@ export class Codec {
     (this as any).parseHeader();
   }
 
-  get avl() {
+  public get avl() {
     return this.avlObj;
   }
 }

@@ -44,7 +44,4 @@ export class Codec12 extends Codec {
     }
   }
 
-  get avl(): any {
-    return super.avl;
-  }
 }

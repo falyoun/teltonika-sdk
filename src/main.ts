@@ -12,27 +12,27 @@ const testCodec8 = () => {
   const fmbParser = new FmbParser(buff);
   const avl: AvlPacket = fmbParser.avl;
 
-  const avlPacket = new AvlPacket(
-    avl.records,
-    avl.zero,
-    avl.data_length,
-    avl.codec_id,
-    avl.number_of_data,
-    avl.number_of_data2,
-    avl.CRC
-  );
+  // const avlPacket = new AvlPacket(
+  //   avl.records,
+  //   avl.zero,
+  //   avl.data_length,
+  //   avl.codec_id,
+  //   avl.number_of_data,
+  //   avl.number_of_data2,
+  //   avl.CRC
+  // );
   // console.log(avlPacket);
   for (let i = 0; i < avl.records.length; i++) {
     const avlRecord: AvlRecord = avl.records[i];
     console.log(avlRecord)
-    const avlInstance = new AvlRecord(
-      avlRecord.priority,
-      avlRecord.timestamp,
-      avlRecord.gps,
-      avlRecord.event_id,
-      avlRecord.properties_count,
-      avlRecord.ioElements
-    )
+    // const avlInstance = new AvlRecord(
+    //   avlRecord.priority,
+    //   avlRecord.timestamp,
+    //   avlRecord.gps,
+    //   avlRecord.event_id,
+    //   avlRecord.properties_count,
+    //   avlRecord.ioElements
+    // )
      // avlInstance.print();
   }
 }
@@ -66,7 +66,7 @@ async function bootstrap() {
   try {
     await bootstrap();
     console.log('Server is up and running...');
-    // testCodec8();
+    testCodec8();
     testCodec12();
   } catch (e) {
     console.error(e);

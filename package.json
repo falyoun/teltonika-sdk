@@ -1,9 +1,8 @@
 {
-  "name": "fmb120",
+  "name": "teltonika-parser-nestjs",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
+  "description": "Parse teltonika data received from fmbXXX devices",
+  "author": "Abdulrahman Falyoun",
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
