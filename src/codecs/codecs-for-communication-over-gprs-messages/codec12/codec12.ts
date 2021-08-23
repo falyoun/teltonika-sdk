@@ -4,8 +4,7 @@
  * This protocol is also necessary for using FMB630/FM6300/FM5300/FM5500/FM4200 features like: Garmin, LCD communication, COM TCP Link Mode.
  */
 import { Codec } from '../../codec';
-import { convertBytesToInt, sanitizeGPS, sanitizeLongLat } from '../../../utils';
-import { AvlRecord, GpsElement } from '../../../models';
+import { convertBytesToInt, convertHexToAscii } from '../../../utils';
 
 export class Codec12 extends Codec {
 
@@ -21,34 +20,28 @@ export class Codec12 extends Codec {
   }
 
   parseAvlRecords() {
-    // const timestamp = new Date(convertBytesToInt(this.reader.ReadBytes(8)));
-    // const priority = convertBytesToInt(this.reader.ReadBytes(1));
-    //
-    //
-    // const longitude = this.reader.ReadInt32();
-    // const latitude = this.reader.ReadInt32();
-    // const altitude = this.reader.ReadInt16();
-    // const angle = this.reader.ReadInt16();
-    // const satellites = this.reader.ReadInt8();
-    // const speed = this.reader.ReadInt16();
-    //
-    //
-    // const gpsElement = new GpsElement(
-    //   longitude,
-    //   latitude,
-    //   altitude,
-    //   angle,
-    //   satellites,
-    //   speed
-    // );
-    //
-    // const avlRecord = sanitizeLongLat(gpsElement);
-    // gpsElement.latitude = avlRecord.gps.latitude;
-    // gpsElement.longitude = avlRecord.gps.longitude;
-    //
-    //
-    //
-    // return new AvlRecord(priority, timestamp, gpsElement);
+    const commandType = convertBytesToInt(this.reader.ReadBytes(1));
+
+    if (commandType === 5) {
+      // Command message structure
+      const commandSize = convertBytesToInt(this.reader.ReadBytes(4));
+      let command = '';
+      for (let i = 0; i < commandSize; i++) {
+        command += convertHexToAscii(this.reader.ReadBytes(1));
+      }
+      console.log('command: ', command);
+    }
+
+
+    if (commandType === 6) {
+      // Response message structure
+      const responseSize = convertBytesToInt(this.reader.ReadBytes(4));
+      let response = '';
+      for(let i = 0; i < responseSize; i++) {
+        response += convertHexToAscii(this.reader.ReadBytes(1));
+      }
+      console.log('response: ', response);
+    }
   }
 
   get avl(): any {
