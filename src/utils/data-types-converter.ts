@@ -1,0 +1,1 @@
+export const convertBytesToInt = (bytes: Buffer, numeralSystem: BufferEncoding = 'hex', radix = 16) => <number> (parseInt(bytes.toString(numeralSystem), radix));
