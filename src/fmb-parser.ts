@@ -3,6 +3,7 @@ import { Codec8, Codec8ex } from './codecs';
 import { convertBytesToInt } from './utils';
 import { Codec12 } from './codecs/codecs-for-communication-over-gprs-messages/codec12/codec12';
 import { Codec16 } from '@app/codecs/codecs-for-device-data-sending/codec16';
+import { Codec13 } from '@app/codecs/codecs-for-communication-over-gprs-messages';
 
 export class FmbParser {
   private readonly _reader: any;
@@ -29,7 +30,7 @@ export class FmbParser {
     if (imeiLength > 0) {
       this.isImei = true;
       this.imei = this._reader.ReadBytes(imeiLength).toString();
-      console.log({ imei: this.imei })
+      console.log({ imei: this.imei });
     } else {
       convertBytesToInt(this._reader.ReadBytes(2));
     }
@@ -65,6 +66,12 @@ export class FmbParser {
         break;
       case 12:
         this._codec = new Codec12(
+          this._codecReader,
+          this._avlObj.number_of_data,
+        );
+        break;
+      case 13:
+        this._codec = new Codec13(
           this._codecReader,
           this._avlObj.number_of_data,
         );

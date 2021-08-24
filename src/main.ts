@@ -62,6 +62,14 @@ const testCodec12 = () => {
   console.log(fromDeviceFmbParser.avl)
 
 };
+
+const testCodec13 = () => {
+  let codec13packet = '00000000000000170D0105000000070A81C320676574696E666F0100006855';
+  const buff = Buffer.from(codec13packet, 'hex');
+  const fmbParser = new FmbParser(buff);
+  console.log(fmbParser.avl)
+
+};
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get<ConfigService>(ConfigService);
@@ -85,7 +93,9 @@ async function bootstrap() {
     console.log("Codec 12");
     console.log('---------------------------------------------------------------------------------------------------');
     testCodec12();
-
+    console.log("Codec 13");
+    console.log('---------------------------------------------------------------------------------------------------');
+    testCodec13();
   } catch (e) {
     console.error(e);
   }
