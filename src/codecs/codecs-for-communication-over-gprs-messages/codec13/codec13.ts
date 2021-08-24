@@ -25,6 +25,7 @@ export class Codec13 extends Codec {
       // Command message structure
       const commandSize = convertBytesToInt(this.reader.ReadBytes(4));
       const timestamp = new Date(convertBytesToInt(this.reader.ReadBytes(4)));
+      console.log('timestamp: ', timestamp)
       let command = '';
       for (let i = 0; i < commandSize; i++) {
         command += convertHexToAscii(this.reader.ReadBytes(1));
