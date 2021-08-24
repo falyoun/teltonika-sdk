@@ -1,7 +1,8 @@
-import { Codec } from '../../codec';
+import { Codec } from '@app/codecs';
 export declare class Codec16 extends Codec {
-    reader: any;
-    number_of_records: number;
-    constructor(reader: any, number_of_records: number);
-    process(): void;
+    constructor(reader: any, number_of_records: any);
+    parseHeader(): void;
+    parseAvlRecords(): void;
+    parseIoElements(): any[];
+    getAvl(): any;
 }

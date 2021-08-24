@@ -1,14 +1,14 @@
 export declare class FmbParser {
-    _reader: any;
-    _avlObj: any;
-    isImei: boolean;
-    imei: any;
-    _codecReader: any;
-    _codec: any;
+    private readonly _reader;
+    private _avlObj;
+    private isImei;
+    private imei;
+    private _codecReader;
+    private _codec;
     constructor(buffer: any);
     checkIsImei(): void;
-    parseHeader(): void;
-    decodeData(): void;
-    parseFooter(): void;
+    private parseHeader;
+    private decodeData;
+    private parseFooter;
     get avl(): any;
 }
