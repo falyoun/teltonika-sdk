@@ -1,4 +1,4 @@
-import { Codec } from '../../codec';
+import { Codec } from '@app/codecs';
 export declare class Codec8ex extends Codec {
     _gpsPrecision: any;
     static get ODOMETER_PROPERTY_ID(): number;

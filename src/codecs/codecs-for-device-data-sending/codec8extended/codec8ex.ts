@@ -1,6 +1,6 @@
-import { Codec } from '../../codec';
-import { convertBytesToInt, prepareIOEntity, sanitizeGPS } from '../../../utils';
-import { Codec8extendedIoElements } from './codec8extended-io-elements';
+import { Codec } from '@app/codecs';
+import { convertBytesToInt, prepareIOEntity, sanitizeGPS } from '@app/utils';
+import { Codec8extendedIoElements } from '@app/codecs';
 
 export class Codec8ex extends Codec {
   _gpsPrecision: any;
