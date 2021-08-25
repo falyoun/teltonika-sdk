@@ -39,6 +39,8 @@ export class TeltonikaPacketsParser {
   }
 
   private process() {
+    // We need to advance the point until we encounter the id
+    // with the result of that, we can destruct the id value
     this._reader.ReadInt32(); // data size record
     const codec_id = convertBytesToInt(this._reader.ReadBytes(1));
     this._reader = new binutils.BinaryReader(this._buff);
