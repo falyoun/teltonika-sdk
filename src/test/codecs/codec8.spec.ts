@@ -1,4 +1,4 @@
-import { AvlRecord, AvlPacket } from '../../models';
+import { AvlRecord, AvlPacket } from '../../codecs/codecs-for-device-data-sending/models';
 import { TeltonikaPacketsParser } from '@app/teltonika-packets-parser';
 
 

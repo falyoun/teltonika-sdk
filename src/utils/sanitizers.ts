@@ -1,4 +1,4 @@
-import { GpsElement } from '../models';
+import { GpsElement } from '@app/codecs';
 
 
 export const sanitizeLongLat = (gpsElement: GpsElement, gpsPrecision = 10000000) => sanitizeGPS({ gps: { ...gpsElement } }, gpsPrecision);

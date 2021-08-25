@@ -3,15 +3,14 @@
  * Main differences of Codec13 are that timestamp is using in messages and communication is one way only (Codec13 is used for Device -> Server sending).
  */
 import { convertBytesToInt, convertHexToAscii } from '@app/utils';
-import { BaseCfcogm } from '../base-cfcogm';
-export class Codec13 extends BaseCfcogm {
+import { BaseCodec } from '@app/codecs';
+export class Codec13 extends BaseCodec {
 
-  constructor(reader) {
-    super(reader);
+  constructor(reader, codecType) {
+    super(reader, codecType);
   }
   decodeBody() {
-    this.avl.records = [];
-    for (let i = 0; i < this.avl.commands_quantity_1; i++) {
+    for (let i = 0; i < this.tcpTeltonikaPacket.header.numberOfRecords1; i++) {
       const commandType = convertBytesToInt(this.reader.ReadBytes(1));
       if (commandType === 5) {
         // Command message structure

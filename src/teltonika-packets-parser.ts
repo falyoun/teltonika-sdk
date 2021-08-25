@@ -1,20 +1,12 @@
 import * as binutils from 'binutils64';
 import { convertBytesToInt } from '@app/utils';
-import {
-  Codec8,
-  Codec8ex,
-  Codec12,
-  Codec16,
-  Codec13,
-  BaseCfdds,
-} from '@app/codecs';
-import { BaseCfcogm } from '@app/codecs/codecs-for-communication-over-gprs-messages/base-cfcogm';
+import { BaseCodec, Codec12, Codec13, Codec16, Codec8, Codec8ex, CodecsTypesEnum } from '@app/codecs';
 
 export class TeltonikaPacketsParser {
   private _reader: any;
   private isImei = false;
   private imei: any;
-  private _codec: BaseCfdds | BaseCfcogm;
+  private _codec: BaseCodec;
   private _avl: any = {};
   private readonly _buff;
   constructor(buffer) {
@@ -46,19 +38,19 @@ export class TeltonikaPacketsParser {
     this._reader = new binutils.BinaryReader(this._buff);
     switch (codec_id) {
       case 8:
-        this._codec = new Codec8(this._reader);
+        this._codec = new Codec8(this._reader, CodecsTypesEnum.DEVICE_DATA_SENDING_CODEC);
         break;
       case 142:
-        this._codec = new Codec8ex(this._reader);
+        this._codec = new Codec8ex(this._reader, CodecsTypesEnum.DEVICE_DATA_SENDING_CODEC);
         break;
       case 16:
-        this._codec = new Codec16(this._reader);
+        this._codec = new Codec16(this._reader, CodecsTypesEnum.DEVICE_DATA_SENDING_CODEC);
         break;
       case 12:
-        this._codec = new Codec12(this._reader);
+        this._codec = new Codec12(this._reader, CodecsTypesEnum.COMMUNICATION_OVER_GPRS_CODEC);
         break;
       case 13:
-        this._codec = new Codec13(this._reader);
+        this._codec = new Codec13(this._reader, CodecsTypesEnum.COMMUNICATION_OVER_GPRS_CODEC);
         break;
     }
 

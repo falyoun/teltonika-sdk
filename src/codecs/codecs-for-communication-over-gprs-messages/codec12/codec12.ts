@@ -4,16 +4,15 @@
  * This protocol is also necessary for using FMB630/FM6300/FM5300/FM5500/FM4200 features like: Garmin, LCD communication, COM TCP Link Mode.
  */
 import { convertBytesToInt, convertHexToAscii } from '@app/utils';
-import { BaseCfcogm } from '@app/codecs/codecs-for-communication-over-gprs-messages/base-cfcogm';
+import { BaseCodec } from '@app/codecs';
 
-export class Codec12 extends BaseCfcogm {
-  constructor(reader) {
-    super(reader);
+export class Codec12 extends BaseCodec {
+  constructor(reader, codecType) {
+    super(reader, codecType);
   }
 
   decodeBody() {
-    this.avl.records = [];
-    for (let i = 0; i < this.avl.commands_quantity_1; i++) {
+    for (let i = 0; i < this.tcpTeltonikaPacket.header.numberOfRecords1; i++) {
       const commandType = convertBytesToInt(this.reader.ReadBytes(1));
 
       if (commandType === 5) {
