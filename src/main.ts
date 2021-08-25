@@ -7,7 +7,6 @@ const testCodec8 = () => {
   let codec8packet =
     '000000000000004308020000016B40D57B480100000000000000000000000000000001010101000000000000016B40D5C198010000000000000000000000000000000101010101000000020000252C';
   const buff = Buffer.from(codec8packet, 'hex');
-  console.log('dqwdqwdqwdqwdwqs')
   const teltonikaPacketsParser = new TeltonikaPacketsParser(buff);
   console.log(teltonikaPacketsParser.avl);
 };
