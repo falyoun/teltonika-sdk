@@ -1,9 +1,7 @@
-import { Codec } from '@app/codecs';
-export declare class Codec8 extends Codec {
+import { BaseCfdds } from '../base-cfdds';
+export declare class Codec8 extends BaseCfdds {
     private readonly _gpsPrecision;
-    static get ODOMETER_PROPERTY_ID(): number;
-    constructor(reader: any, number_of_records: number);
-    parseHeader(): void;
-    parseAvlRecords(): void;
-    parseIoElements(): any[];
+    constructor(reader: any);
+    private _parseIoElements;
+    decodeBody(): void;
 }

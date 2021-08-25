@@ -1,49 +1,37 @@
-import { Codec } from '@app/codecs';
-import { convertBytesToInt, prepareIOEntity, sanitizeGPS } from '@app/utils';
 import { Codec8extendedIoElements } from '@app/codecs';
-
-export class Codec8ex extends Codec {
+import { convertBytesToInt, prepareIOEntity, sanitizeGPS } from '@app/utils';
+import { BaseCfdds } from '../base-cfdds';
+export class Codec8ex extends BaseCfdds {
   _gpsPrecision: any;
-
-  static get ODOMETER_PROPERTY_ID() {
-    return 16;
-  }
-
-  constructor(reader, number_of_records) {
-    super(reader, number_of_records);
+  constructor(reader) {
+    super(reader);
     this._gpsPrecision = 10000000;
   }
 
-  parseHeader() {
-    this.avlObj.records = [];
-    for (let i = 0; i < this.number_of_records; i++) {
-      this.parseAvlRecords();
+  decodeBody() {
+    this.avl.records = [];
+    for (let i = 0; i < this.avl.number_of_data; i++) {
+      let avlRecord = {
+        timestamp: new Date(convertBytesToInt(this.reader.ReadBytes(8))),
+        priority: convertBytesToInt(this.reader.ReadBytes(1)),
+        gps: {
+          longitude: this.reader.ReadInt32(),
+          latitude: this.reader.ReadInt32(),
+          altitude: this.reader.ReadInt16(),
+          angle: this.reader.ReadInt16(),
+          satellites: this.reader.ReadInt8(),
+          speed: this.reader.ReadInt16(),
+        },
+        event_id: convertBytesToInt(this.reader.ReadBytes(2)),
+        properties_count: convertBytesToInt(this.reader.ReadBytes(2)),
+        ioElements: [],
+      };
+      avlRecord = sanitizeGPS(avlRecord, this._gpsPrecision);
+      avlRecord.ioElements = this._parseIoElements();
+      this.avl.records.push(avlRecord);
     }
   }
-
-  parseAvlRecords() {
-    let avlRecord = {
-      timestamp: new Date(convertBytesToInt(this.reader.ReadBytes(8))),
-      priority: convertBytesToInt(this.reader.ReadBytes(1)),
-      gps: {
-        longitude: this.reader.ReadInt32(),
-        latitude: this.reader.ReadInt32(),
-        altitude: this.reader.ReadInt16(),
-        angle: this.reader.ReadInt16(),
-        satellites: this.reader.ReadInt8(),
-        speed: this.reader.ReadInt16(),
-      },
-      event_id: convertBytesToInt(this.reader.ReadBytes(2)),
-      properties_count: convertBytesToInt(this.reader.ReadBytes(2)),
-      ioElements: [],
-    };
-    avlRecord = sanitizeGPS(avlRecord, this._gpsPrecision);
-    avlRecord.ioElements = this.parseIoElements();
-
-    this.avlObj.records.push(avlRecord);
-  }
-
-  parseIoElements() {
+  private _parseIoElements() {
     let ioElement = [];
 
     // 1 byte

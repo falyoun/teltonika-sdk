@@ -1,43 +1,12 @@
-// import * as binutils from 'binutils64';
 import { convertBytesToInt } from '@app/utils';
-import { Codec } from '@app/codecs';
+import { BaseCfdds } from '../base-cfdds';
 
-export class Codec16 extends Codec {
-  constructor(reader, number_of_records) {
-    super(reader, number_of_records);
+export class Codec16 extends BaseCfdds {
+  constructor(reader) {
+    super(reader);
   }
 
-  parseHeader() {
-    this.avlObj.records = [];
-    for (let i = 0; i < this.number_of_records; i++) {
-      this.parseAvlRecords();
-    }
-  }
-
-  parseAvlRecords() {
-    let avlRecord: any = {};
-    avlRecord.timestamp = new Date(convertBytesToInt(this.reader.ReadBytes(8)));
-    avlRecord.priority = convertBytesToInt(this.reader.ReadBytes(1));
-    avlRecord.longtitude = this.reader.ReadInt32();
-    avlRecord.latitude = this.reader.ReadInt32();
-    avlRecord.atitude = this.reader.ReadInt16();
-    avlRecord.angle = this.reader.ReadInt16();
-    avlRecord.satelites = this.reader.ReadInt8();
-    avlRecord.speed = this.reader.ReadInt16();
-
-    avlRecord.event_id = convertBytesToInt(this.reader.ReadBytes(2));
-    avlRecord.generationType = convertBytesToInt(this.reader.ReadBytes(1));
-    avlRecord.properties_count = convertBytesToInt(this.reader.ReadBytes(1));
-    avlRecord.ioElements = [];
-
-    for (let j = 0; j < avlRecord.properties_count; j++) {
-      avlRecord.ioElements.push(this.parseIoElements());
-    }
-
-    this.avlObj.records.push(avlRecord);
-  }
-
-  parseIoElements() {
+  private _parseIoElements() {
     let ioElement = [];
 
     let ioCountInt8 = convertBytesToInt(this.reader.ReadBytes(1));
@@ -71,7 +40,31 @@ export class Codec16 extends Codec {
     return ioElement;
   }
 
-  getAvl() {
-    return this.avlObj;
+  decodeBody(): void {
+    this.avl.records = [];
+    for (let i = 0; i < this.avl.number_of_data; i++) {
+      let avlRecord: any = {};
+      avlRecord.timestamp = new Date(
+        convertBytesToInt(this.reader.ReadBytes(8)),
+      );
+      avlRecord.priority = convertBytesToInt(this.reader.ReadBytes(1));
+      avlRecord.longtitude = this.reader.ReadInt32();
+      avlRecord.latitude = this.reader.ReadInt32();
+      avlRecord.atitude = this.reader.ReadInt16();
+      avlRecord.angle = this.reader.ReadInt16();
+      avlRecord.satelites = this.reader.ReadInt8();
+      avlRecord.speed = this.reader.ReadInt16();
+
+      avlRecord.event_id = convertBytesToInt(this.reader.ReadBytes(2));
+      avlRecord.generationType = convertBytesToInt(this.reader.ReadBytes(1));
+      avlRecord.properties_count = convertBytesToInt(this.reader.ReadBytes(1));
+      avlRecord.ioElements = [];
+
+      for (let j = 0; j < avlRecord.properties_count; j++) {
+        avlRecord.ioElements.push(this._parseIoElements());
+      }
+
+      this.avl.records.push(avlRecord);
+    }
   }
 }

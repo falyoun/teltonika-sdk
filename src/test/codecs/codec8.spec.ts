@@ -1,5 +1,5 @@
-import { FmbParser } from '../../fmb-parser';
 import { AvlRecord, AvlPacket } from '../../models';
+import { TeltonikaPacketsParser } from '@app/teltonika-packets-parser';
 
 
 const testFmbParser = () => {
@@ -139,7 +139,7 @@ const testFmbParser = () => {
   let packet = Preamble + Data_Field_Length + Codec_ID + Number_Of_Data_1 + Avl_Data + Number_Of_Data_2 + CRC_16;
 
   const buff = Buffer.from(packet, 'hex');
-  const fmbParser = new FmbParser(buff);
+  const fmbParser = new TeltonikaPacketsParser(buff);
   const avl: AvlPacket = fmbParser.avl;
   return new AvlPacket(
     avl.records,
