@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { TeltonikaPacketsParser } from './teltonika-packets-parser';
 import { Codec14 } from '@app/codecs';
-
+import * as net from 'net';
 const testCodec8 = () => {
   let codec8packet =
     '000000000000004308020000016B40D57B480100000000000000000000000000000001010101000000000000016B40D5C198010000000000000000000000000000000101010101000000020000252C';
@@ -69,25 +69,26 @@ const dashLine = () =>
 (async () => {
   try {
     await bootstrap();
-    console.log('Server is up and running...');
-    dashLine();
-    console.log('Codec 8');
-    dashLine();
-    testCodec8();
-    dashLine();
-    console.log('Codec 16');
-    dashLine();
-    testCodec16();
-    dashLine();
-    console.log('Codec 12');
-    dashLine();
-    testCodec12();
-    console.log('Codec 13');
-    dashLine();
-    testCodec13();
-    console.log('Codec 14');
-    dashLine();
-    testCodec14();
+    // console.log('Server is up and running...');
+    // dashLine();
+    // console.log('Codec 8');
+    // dashLine();
+    // testCodec8();
+    // dashLine();
+    // console.log('Codec 16');
+    // dashLine();
+    // testCodec16();
+    // dashLine();
+    // console.log('Codec 12');
+    // dashLine();
+    // testCodec12();
+    // console.log('Codec 13');
+    // dashLine();
+    // testCodec13();
+    // console.log('Codec 14');
+    // dashLine();
+    // testCodec14();
+    // openTcpStream();
   } catch (e) {
     console.error(e);
   }
