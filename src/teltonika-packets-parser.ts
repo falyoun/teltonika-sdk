@@ -1,13 +1,23 @@
 import * as binutils from 'binutils64';
 import { convertBytesToInt } from '@app/utils';
-import { BaseCodec, Codec12, Codec13, Codec16, Codec8, Codec8ex, CodecsTypesEnum } from '@app/codecs';
+import {
+  BaseCodec,
+  Codec12,
+  Codec13,
+  Codec14,
+  Codec16,
+  Codec8,
+  Codec8ex,
+  CodecsTypesEnum,
+  TcpTeltonikaPacket,
+} from '@app/codecs';
 
 export class TeltonikaPacketsParser {
   private _reader: any;
   private isImei = false;
   private imei: any;
   private _codec: BaseCodec;
-  private _avl: any = {};
+  private _tcpTeltonikaPacket: TcpTeltonikaPacket;
   private readonly _buff;
   constructor(buffer) {
     this._buff = buffer;
@@ -52,16 +62,19 @@ export class TeltonikaPacketsParser {
       case 13:
         this._codec = new Codec13(this._reader, CodecsTypesEnum.COMMUNICATION_OVER_GPRS_CODEC);
         break;
+      case 14:
+        this._codec = new Codec14(this._reader, CodecsTypesEnum.COMMUNICATION_OVER_GPRS_CODEC);
+        break;
     }
 
-    this.avl = this._codec.decodePacket();
-    return this.avl;
+    this.tcpTeltonikaPacket = this._codec.decodePacket();
+    return this.tcpTeltonikaPacket;
   }
 
-  set avl(value) {
-    this._avl = value;
+  set tcpTeltonikaPacket(value) {
+    this._tcpTeltonikaPacket = value;
   }
-  get avl() {
-    return this._avl;
+  get tcpTeltonikaPacket() {
+    return this._tcpTeltonikaPacket;
   }
 }

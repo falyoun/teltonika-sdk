@@ -3,11 +3,12 @@
  * Codec12 GPRS commands can be used for sending configuration, debug, digital outputs control commands or other (special purpose command on special firmware versions).
  * This protocol is also necessary for using FMB630/FM6300/FM5300/FM5500/FM4200 features like: Garmin, LCD communication, COM TCP Link Mode.
  */
-import { convertBytesToInt, convertHexToAscii } from '@app/utils';
-import { BaseCodec } from '@app/codecs';
+import { checkCodecType, convertBytesToInt, convertHexToAscii } from '@app/utils';
+import { BaseCodec, CodecsTypesEnum } from '@app/codecs';
 
 export class Codec12 extends BaseCodec {
-  constructor(reader, codecType) {
+  constructor(reader, codecType: CodecsTypesEnum) {
+    checkCodecType(codecType, CodecsTypesEnum.COMMUNICATION_OVER_GPRS_CODEC);
     super(reader, codecType);
   }
 
