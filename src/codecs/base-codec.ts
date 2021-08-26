@@ -1,13 +1,14 @@
 import { convertBytesToInt } from '@app/utils';
 import { ICodecDecoder } from '@app/codecs/interfaces';
 import { CodecsTypesEnum, TcpTeltonikaPacket } from '@app/codecs';
+import { BinaryReader } from '@app/binary-data-handler';
 
 
 export abstract class BaseCodec implements ICodecDecoder {
   private readonly _tcpTeltonikaPacket: TcpTeltonikaPacket;
 
   protected constructor(
-    protected reader: any,
+    protected reader: BinaryReader,
     codecType: CodecsTypesEnum
   ) {
     this.reader = reader;
@@ -31,22 +32,22 @@ export abstract class BaseCodec implements ICodecDecoder {
 
   private decodeFooter() {
     this.tcpTeltonikaPacket.footer = {
-      numberOfRecords2: convertBytesToInt(this.reader.ReadBytes(1)),
+      numberOfRecords2: convertBytesToInt(this.reader.readBytes(1)),
       CRC: {
-        0: convertBytesToInt(this.reader.ReadBytes(1)),
-        1: convertBytesToInt(this.reader.ReadBytes(1)),
-        2: convertBytesToInt(this.reader.ReadBytes(1)),
-        3: convertBytesToInt(this.reader.ReadBytes(1)),
+        0: convertBytesToInt(this.reader.readBytes(1)),
+        1: convertBytesToInt(this.reader.readBytes(1)),
+        2: convertBytesToInt(this.reader.readBytes(1)),
+        3: convertBytesToInt(this.reader.readBytes(1)),
       },
     }
   }
 
   private decodeHeader() {
     this.tcpTeltonikaPacket.header = {
-      zeros: convertBytesToInt(this.reader.ReadBytes(4)),
-      dataSize: this.reader.ReadInt32(),
-      codecId: convertBytesToInt(this.reader.ReadBytes(1)),
-      numberOfRecords1: convertBytesToInt(this.reader.ReadBytes(1))
+      zeros: convertBytesToInt(this.reader.readBytes(4)),
+      dataSize: this.reader.readInt32(),
+      codecId: convertBytesToInt(this.reader.readBytes(1)),
+      numberOfRecords1: convertBytesToInt(this.reader.readBytes(1))
     };
   }
 }

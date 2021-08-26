@@ -24,8 +24,6 @@
     "@nestjs/config": "^1.0.1",
     "@nestjs/core": "^8.0.0",
     "@nestjs/platform-express": "^8.0.0",
-    "binutils": "^0.1.0",
-    "binutils64": "^0.1.2",
     "crc": "^3.8.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

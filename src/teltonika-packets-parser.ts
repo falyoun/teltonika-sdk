@@ -1,4 +1,3 @@
-import * as binutils from 'binutils64';
 import { convertBytesToInt } from '@app/utils';
 import {
   BaseCodec,
@@ -11,9 +10,10 @@ import {
   CodecsTypesEnum,
   TcpTeltonikaPacket,
 } from '@app/codecs';
+import { BinaryReader } from '@app/binary-data-handler';
 
 export class TeltonikaPacketsParser {
-  private _reader: any;
+  private _reader: BinaryReader;
   private isImei = false;
   private imei: any;
   private _codec: BaseCodec;
@@ -21,7 +21,7 @@ export class TeltonikaPacketsParser {
   private readonly _buff;
   constructor(buffer) {
     this._buff = buffer;
-    this._reader = new binutils.BinaryReader(buffer);
+    this._reader = new BinaryReader(buffer);
     this.checkIsImei();
     if (!this.isImei) {
       this.process();
@@ -29,23 +29,23 @@ export class TeltonikaPacketsParser {
   }
 
   private checkIsImei() {
-    let imeiLength = convertBytesToInt(this._reader.ReadBytes(2));
+    let imeiLength = convertBytesToInt(this._reader.readBytes(2));
     console.log({ imeiLength });
     if (imeiLength > 0) {
       this.isImei = true;
-      this.imei = this._reader.ReadBytes(imeiLength).toString();
+      this.imei = this._reader.readBytes(imeiLength).toString();
       console.log({ imei: this.imei });
     } else {
-      convertBytesToInt(this._reader.ReadBytes(2));
+      convertBytesToInt(this._reader.readBytes(2));
     }
   }
 
   private process() {
     // We need to advance the point until we encounter the id
     // with the result of that, we can destruct the id value
-    this._reader.ReadInt32(); // data size record
-    const codec_id = convertBytesToInt(this._reader.ReadBytes(1));
-    this._reader = new binutils.BinaryReader(this._buff);
+    this._reader.readInt32(); // data size record
+    const codec_id = convertBytesToInt(this._reader.readBytes(1));
+    this._reader = new BinaryReader(this._buff);
     switch (codec_id) {
       case 8:
         this._codec = new Codec8(this._reader, CodecsTypesEnum.DEVICE_DATA_SENDING_CODEC);

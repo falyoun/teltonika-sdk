@@ -14,24 +14,24 @@ export class Codec12 extends BaseCodec {
 
   decodeBody() {
     for (let i = 0; i < this.tcpTeltonikaPacket.header.numberOfRecords1; i++) {
-      const commandType = convertBytesToInt(this.reader.ReadBytes(1));
+      const commandType = convertBytesToInt(this.reader.readBytes(1));
 
       if (commandType === 5) {
         // Command message structure
-        const commandSize = convertBytesToInt(this.reader.ReadBytes(4));
+        const commandSize = convertBytesToInt(this.reader.readBytes(4));
         let command = '';
         for (let i = 0; i < commandSize; i++) {
-          command += convertHexToAscii(this.reader.ReadBytes(1));
+          command += convertHexToAscii(this.reader.readBytes(1) as any);
         }
         console.log('command: ', command);
       }
 
       if (commandType === 6) {
         // Response message structure
-        const responseSize = convertBytesToInt(this.reader.ReadBytes(4));
+        const responseSize = convertBytesToInt(this.reader.readBytes(4));
         let response = '';
         for (let i = 0; i < responseSize; i++) {
-          response += convertHexToAscii(this.reader.ReadBytes(1));
+          response += convertHexToAscii(this.reader.readBytes(1) as any);
         }
         console.log('response: ', response);
       }

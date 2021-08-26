@@ -51,7 +51,7 @@ export class Codec14 extends BaseCodec implements GprsCodecInterface {
   }
   protected decodeBody() {
     for (let i = 0; i < this.tcpTeltonikaPacket.header.numberOfRecords1; i++) {
-      const messageType = convertBytesToInt(this.reader.ReadBytes(1));
+      const messageType = convertBytesToInt(this.reader.readBytes(1));
       // 0x06(6 in decimal) (if it is ACK) or 0x11(17 in decimal) (if it is nACK)
       if(messageType === 17) {
         console.log('Not acknowledgement from device');
@@ -59,12 +59,12 @@ export class Codec14 extends BaseCodec implements GprsCodecInterface {
       }
       if (messageType === 6) { // Acknowledgement from device
         // Response message structure
-        const responseSize = convertBytesToInt(this.reader.ReadBytes(4));
-        const imei = convertBytesToInt(this.reader.ReadBytes(8));
+        const responseSize = convertBytesToInt(this.reader.readBytes(4));
+        const imei = convertBytesToInt(this.reader.readBytes(8));
         let response = '';
         for (let i = 0; i < responseSize; i++) {
-          const byte = this.reader.ReadBytes(1);
-          response += convertHexToAscii(byte);
+          const byte = this.reader.readBytes(1);
+          response += convertHexToAscii(byte as any);
         }
 
         console.log('response: ', response);
