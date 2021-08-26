@@ -71,6 +71,9 @@ export class TeltonikaPacketsParser {
     return this.tcpTeltonikaPacket;
   }
 
+  get codec() {
+    return this._codec;
+  }
   set tcpTeltonikaPacket(value) {
     this._tcpTeltonikaPacket = value;
   }

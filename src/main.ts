@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { TeltonikaPacketsParser } from './teltonika-packets-parser';
+import { Codec14 } from '@app/codecs';
 
 const testCodec8 = () => {
   let codec8packet =
@@ -44,56 +45,49 @@ const testCodec13 = () => {
   console.log(teltonikaPacketsParser.tcpTeltonikaPacket);
 };
 const testCodec14 = () => {
-  let codec14packet = '00000000000000AB0E0106000000A303520930814522515665723A30332E31382E31345F3034204750533A41584E5F352E31305F333333332048773A464D42313230204D6F643A313520494D45493A33353230393330383134353232353120496E69743A323031382D31312D323220373A313320557074696D653A3137323334204D41433A363042444430303136323631205350433A312830292041584C3A30204F42443A3020424C3A312E362042543A340100007AAE';
+  let codec14packet =
+    '00000000000000100E011100000008035209308145246801000032AC';
   const buff = Buffer.from(codec14packet, 'hex');
   const teltonikaPacketParser = new TeltonikaPacketsParser(buff);
-  console.log(teltonikaPacketParser.tcpTeltonikaPacket)
-}
+  const codec = teltonikaPacketParser.codec as Codec14;
+  codec.sendCommand();
+  codec.getDeviceResponse();
+
+  console.log(teltonikaPacketParser.tcpTeltonikaPacket);
+};
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get<ConfigService>(ConfigService);
   const port = configService.get('port');
   await app.listen(port);
 }
+const dashLine = () =>
+  console.log(
+    '---------------------------------------------------------------------------------------------------',
+  );
 
 (async () => {
   try {
     await bootstrap();
-    // console.log('Server is up and running...');
-    // console.log(
-    //   '---------------------------------------------------------------------------------------------------',
-    // );
-    // console.log('Codec 8');
-    // console.log(
-    //   '---------------------------------------------------------------------------------------------------',
-    // );
-    // testCodec8();
-    // console.log(
-    //   '---------------------------------------------------------------------------------------------------',
-    // );
-    // console.log('Codec 16');
-    // console.log(
-    //   '---------------------------------------------------------------------------------------------------',
-    // );
-    // testCodec16();
-    // console.log(
-    //   '---------------------------------------------------------------------------------------------------',
-    // );
-    // console.log('Codec 12');
-    // console.log(
-    //   '---------------------------------------------------------------------------------------------------',
-    // );
-    // testCodec12();
-    // console.log('Codec 13');
-    // console.log(
-    //   '---------------------------------------------------------------------------------------------------',
-    // );
-    // testCodec13();
-    // console.log('Codec 14');
-    // console.log(
-    //   '---------------------------------------------------------------------------------------------------',
-    // );
-    // testCodec14();
+    console.log('Server is up and running...');
+    dashLine();
+    console.log('Codec 8');
+    dashLine();
+    testCodec8();
+    dashLine();
+    console.log('Codec 16');
+    dashLine();
+    testCodec16();
+    dashLine();
+    console.log('Codec 12');
+    dashLine();
+    testCodec12();
+    console.log('Codec 13');
+    dashLine();
+    testCodec13();
+    console.log('Codec 14');
+    dashLine();
+    testCodec14();
   } catch (e) {
     console.error(e);
   }
