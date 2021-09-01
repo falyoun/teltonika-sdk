@@ -19,7 +19,7 @@ import { UdpClientService, UdpServerService } from '@app/services';
   providers: [
     // TcpServerService,
     UdpServerService,
-    UdpClientService
+    UdpClientService,
   ],
 })
 export class AppModule {}
