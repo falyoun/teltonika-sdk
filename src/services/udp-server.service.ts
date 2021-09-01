@@ -41,6 +41,6 @@ export class UdpServerService implements OnModuleInit {
         }
       });
     });
-    server.bind(+process.env.TCP_PORT);
+    server.bind(+process.env.TCP_PORT, 'localhost');
   }
 }
