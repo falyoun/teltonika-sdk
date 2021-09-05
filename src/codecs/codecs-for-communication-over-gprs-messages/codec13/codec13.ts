@@ -2,19 +2,20 @@
  * Codec13 is original Teltonika protocol for device-server communication over GPRS messages and it is based on Codec12 protocol.
  * Main differences of Codec13 are that timestamp is using in messages and communication is one way only (Codec13 is used for Device -> Server sending).
  */
+import { convertBytesToInt, convertHexToAscii } from '@app/utils';
 import {
-  checkCodecType,
-  convertBytesToInt,
-  convertHexToAscii,
-} from '@app/utils';
-import { BaseCodec, CodecsTypesEnum } from '@app/codecs';
+  BaseCodec,
+  tcpCFCOGMPacketBody,
+  tcpCFDDSPacketBody,
+} from '@app/codecs';
 export class Codec13 extends BaseCodec {
-  constructor(reader, codecType) {
-    checkCodecType(codecType, CodecsTypesEnum.COMMUNICATION_OVER_GPRS_CODEC);
-    super(reader, codecType);
+  constructor(reader) {
+    super(reader);
   }
-  decodeBody() {
-    for (let i = 0; i < this.tcpTeltonikaPacket.header.numberOfRecords1; i++) {
+  decodeAvlPacket(): tcpCFCOGMPacketBody | Array<tcpCFDDSPacketBody> {
+    const numberOfRecords1 = convertBytesToInt(this.reader.readBytes(1));
+    let body = {} as tcpCFCOGMPacketBody;
+    for (let i = 0; i < numberOfRecords1; i++) {
       const commandType = convertBytesToInt(this.reader.readBytes(1));
       if (commandType === 5) {
         // Command message structure
@@ -26,7 +27,14 @@ export class Codec13 extends BaseCodec {
           command += convertHexToAscii(this.reader.readBytes(1) as any);
         }
         console.log('command: ', command);
+        body = {
+          command,
+          commandType,
+          commandSize,
+        };
       }
     }
+
+    return body;
   }
 }

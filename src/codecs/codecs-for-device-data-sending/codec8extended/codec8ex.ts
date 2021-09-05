@@ -3,14 +3,15 @@ import { convertBytesToInt, prepareIOEntity, sanitizeGPS } from '@app/utils';
 import { BaseCodec } from '../../base-codec';
 export class Codec8ex extends BaseCodec {
   _gpsPrecision: any;
-  constructor(reader, codecType) {
-    super(reader, codecType);
+  constructor(reader) {
+    super(reader);
     this._gpsPrecision = 10000000;
   }
 
-  decodeBody() {
-    const body = this.tcpTeltonikaPacket.body as tcpCFDDSPacketBody[];
-    for (let i = 0; i < this.tcpTeltonikaPacket.header.numberOfRecords1; i++) {
+  decodeAvlPacket() {
+    const numberOfRecords1 = convertBytesToInt(this.reader.readBytes(1));
+    const body = [] as tcpCFDDSPacketBody[];
+    for (let i = 0; i < numberOfRecords1; i++) {
       let avlRecord = {
         timestamp: new Date(convertBytesToInt(this.reader.readBytes(8))),
         priority: convertBytesToInt(this.reader.readBytes(1)),
@@ -25,13 +26,12 @@ export class Codec8ex extends BaseCodec {
         event_id: convertBytesToInt(this.reader.readBytes(2)),
         properties_count: convertBytesToInt(this.reader.readBytes(2)),
         ioElements: [],
-      } as tcpCFDDSPacketBody;
+      } as any;
       avlRecord = sanitizeGPS(avlRecord, this._gpsPrecision);
       avlRecord.ioElements = this._parseIoElements();
       body.push(avlRecord);
     }
-
-    this.tcpTeltonikaPacket.body = body;
+    return body;
   }
   private _parseIoElements() {
     const ioElement = [];

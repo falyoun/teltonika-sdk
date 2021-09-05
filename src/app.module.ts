@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UdpClientService, UdpServerService } from '@app/services';
-// import { TcpServerService } from '@app/services/tcp-server.service';
+import { TcpServerService } from '@app/services/tcp-server.service';
 @Module({
   imports: [
     ConfigModule.forRoot({

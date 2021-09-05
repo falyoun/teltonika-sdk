@@ -1,6 +1,5 @@
-import { TeltonikaPacketsParser } from '@app/teltonika-packets-parser';
 import { TcpTeltonikaPacket } from '@app/codecs';
-
+import { TeltonikaPacketsParser } from '../../teltonika-packets-parser';
 const testFmbParser = () => {
   /**
    * Preamble – the packet starts with four zero bytes.
@@ -175,7 +174,8 @@ describe('Codec 8 parsing packets', () => {
       '000000000000004308020000016B40D57B480100000000000000000000000000000001010101000000000000016B40D5C198010000000000000000000000000000000101010101000000020000252C';
     const buff = Buffer.from(codec8packet, 'hex');
     const teltonikaPacketsParser = new TeltonikaPacketsParser(buff);
-    console.log(teltonikaPacketsParser.tcpTeltonikaPacket);
+    const data = teltonikaPacketsParser.decodeTcpData();
+    console.log(data);
     expect(teltonikaPacketsParser.tcpTeltonikaPacket).toBeDefined();
   });
 });

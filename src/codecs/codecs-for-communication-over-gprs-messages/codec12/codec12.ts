@@ -8,18 +8,22 @@ import {
   convertBytesToInt,
   convertHexToAscii,
 } from '@app/utils';
-import { BaseCodec, CodecsTypesEnum } from '@app/codecs';
+import {
+  BaseCodec,
+  tcpCFCOGMPacketBody,
+  tcpCFDDSPacketBody,
+} from '@app/codecs';
 
 export class Codec12 extends BaseCodec {
-  constructor(reader, codecType: CodecsTypesEnum) {
-    checkCodecType(codecType, CodecsTypesEnum.COMMUNICATION_OVER_GPRS_CODEC);
-    super(reader, codecType);
+  constructor(reader) {
+    super(reader);
   }
 
-  decodeBody() {
-    for (let i = 0; i < this.tcpTeltonikaPacket.header.numberOfRecords1; i++) {
+  decodeAvlPacket(): tcpCFCOGMPacketBody | Array<tcpCFDDSPacketBody> {
+    const numberOfRecords1 = convertBytesToInt(this.reader.readBytes(1));
+    let body = {} as tcpCFCOGMPacketBody;
+    for (let i = 0; i < numberOfRecords1; i++) {
       const commandType = convertBytesToInt(this.reader.readBytes(1));
-
       if (commandType === 5) {
         // Command message structure
         const commandSize = convertBytesToInt(this.reader.readBytes(4));
@@ -28,6 +32,11 @@ export class Codec12 extends BaseCodec {
           command += convertHexToAscii(this.reader.readBytes(1) as any);
         }
         console.log('command: ', command);
+        body = {
+          command,
+          commandSize,
+          commandType,
+        };
       }
 
       if (commandType === 6) {
@@ -38,7 +47,13 @@ export class Codec12 extends BaseCodec {
           response += convertHexToAscii(this.reader.readBytes(1) as any);
         }
         console.log('response: ', response);
+        body = {
+          command: response,
+          commandSize: responseSize,
+          commandType,
+        };
       }
     }
+    return body;
   }
 }

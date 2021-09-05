@@ -1,10 +1,10 @@
 import { convertBytesToInt } from '@app/utils';
 import { BaseCodec } from '../../base-codec';
-import { tcpCFDDSPacketBody } from '@app/codecs';
+import { tcpCFCOGMPacketBody, tcpCFDDSPacketBody } from '@app/codecs';
 
 export class Codec16 extends BaseCodec {
-  constructor(reader, codecType) {
-    super(reader, codecType);
+  constructor(reader) {
+    super(reader);
   }
 
   private _parseIoElements() {
@@ -41,9 +41,10 @@ export class Codec16 extends BaseCodec {
     return ioElement;
   }
 
-  decodeBody(): void {
-    const body = this.tcpTeltonikaPacket.body as tcpCFDDSPacketBody[];
-    for (let i = 0; i < this.tcpTeltonikaPacket.header.numberOfRecords1; i++) {
+  decodeAvlPacket(): tcpCFCOGMPacketBody | Array<tcpCFDDSPacketBody> {
+    const numberOfRecords1 = convertBytesToInt(this.reader.readBytes(1));
+    const body = [] as tcpCFDDSPacketBody[];
+    for (let i = 0; i < numberOfRecords1; i++) {
       const avlRecord: any = {};
       avlRecord.timestamp = new Date(
         convertBytesToInt(this.reader.readBytes(8)),
@@ -67,6 +68,6 @@ export class Codec16 extends BaseCodec {
 
       body.push(avlRecord);
     }
-    this.tcpTeltonikaPacket.body = body;
+    return body;
   }
 }

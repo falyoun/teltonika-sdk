@@ -1,6 +1,10 @@
-import { BaseCodec, CodecsTypesEnum, GprsCodecInterface } from '@app/codecs';
 import {
-  checkCodecType,
+  BaseCodec,
+  GprsCodecInterface,
+  tcpCFCOGMPacketBody,
+  tcpCFDDSPacketBody,
+} from '@app/codecs';
+import {
   convertAsciiToBinary,
   convertBytesToInt,
   convertHexToAscii,
@@ -13,9 +17,8 @@ import { TeltonikaPacketsParser } from '@app/teltonika-packets-parser';
  * Codec14 GPRS commands can be used for sending configuration, debug, digital outputs control commands or other (special purpose command on special firmware versions).
  */
 export class Codec14 extends BaseCodec implements GprsCodecInterface {
-  constructor(reader, codecType: CodecsTypesEnum) {
-    checkCodecType(codecType, CodecsTypesEnum.COMMUNICATION_OVER_GPRS_CODEC);
-    super(reader, codecType);
+  constructor(reader) {
+    super(reader);
   }
 
   sendCommand(command: string) {
@@ -63,13 +66,14 @@ export class Codec14 extends BaseCodec implements GprsCodecInterface {
     );
     console.log('Device response tcp packet: ', parser.tcpTeltonikaPacket);
   }
-  protected decodeBody() {
-    for (let i = 0; i < this.tcpTeltonikaPacket.header.numberOfRecords1; i++) {
+  decodeAvlPacket(): tcpCFCOGMPacketBody | Array<tcpCFDDSPacketBody> {
+    const numberOfRecords1 = convertBytesToInt(this.reader.readBytes(1));
+    let body = {} as tcpCFCOGMPacketBody;
+    for (let i = 0; i < numberOfRecords1; i++) {
       const messageType = convertBytesToInt(this.reader.readBytes(1));
       // 0x06(6 in decimal) (if it is ACK) or 0x11(17 in decimal) (if it is nACK)
       if (messageType === 17) {
-        console.log('Not acknowledgement from device');
-        return;
+        throw new Error('Not acknowledgement from device');
       }
       if (messageType === 6) {
         // Acknowledgement from device
@@ -81,9 +85,14 @@ export class Codec14 extends BaseCodec implements GprsCodecInterface {
           const byte = this.reader.readBytes(1);
           response += convertHexToAscii(byte as any);
         }
-
+        body = {
+          command: response,
+          commandSize: responseSize,
+          commandType: messageType,
+        };
         console.log('response: ', response);
       }
     }
+    return body;
   }
 }

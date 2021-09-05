@@ -1,3 +1,5 @@
+import { tcpCFCOGMPacketBody, tcpCFDDSPacketBody } from '@app/codecs';
+
 export interface ICodecDecoder {
-  decodePacket: () => any;
+  decodeAvlPacket: () => tcpCFCOGMPacketBody | Array<tcpCFDDSPacketBody>;
 }
