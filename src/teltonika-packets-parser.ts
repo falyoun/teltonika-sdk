@@ -1,9 +1,4 @@
-import {
-  calculateCRC,
-  convertBytesToInt,
-  prepareIOEntity,
-  sanitizeGPS,
-} from '@app/utils';
+import { convertBytesToInt, prepareIOEntity, sanitizeGPS } from '@app/utils';
 import {
   BaseCodec,
   Codec12,
@@ -14,11 +9,9 @@ import {
   Codec8ex,
   Codec8IoElements,
   CodecsTypesEnum,
-  tcpCFDDSPacketBody,
   TcpTeltonikaPacket,
 } from '@app/codecs';
 import { BinaryReader } from '@app/binary-data-handler';
-import * as crcLib from 'crc';
 
 export enum DecoderTypes {
   UDP_DECODER = 'udp_decoder',
@@ -48,15 +41,15 @@ export class TeltonikaPacketsParser {
       const length = this._reader.readInt32(); // convertBytesToInt(this._reader.readBytes(4));
       const codecId = convertBytesToInt(this._reader.readBytes(1));
       if (codecId === 8 || codecId === 142 || codecId === 16) {
-        this.tcpTeltonikaPacket = new TcpTeltonikaPacket(
+        this._tcpTeltonikaPacket = new TcpTeltonikaPacket(
           CodecsTypesEnum.DEVICE_DATA_SENDING_CODEC,
         );
       } else {
-        this.tcpTeltonikaPacket = new TcpTeltonikaPacket(
+        this._tcpTeltonikaPacket = new TcpTeltonikaPacket(
           CodecsTypesEnum.COMMUNICATION_OVER_GPRS_CODEC,
         );
       }
-      this.tcpTeltonikaPacket.header = {
+      this._tcpTeltonikaPacket.header = {
         preamble,
         length,
       };
@@ -67,7 +60,7 @@ export class TeltonikaPacketsParser {
       // const numberOfRecords2 = convertBytesToInt(this._reader.readBytes(1));
       const crc = this._reader.readInt32();
       // let crc = 0;
-      this.tcpTeltonikaPacket.footer = {
+      this._tcpTeltonikaPacket.footer = {
         crc,
       };
       if (preamble != 0)
@@ -76,7 +69,16 @@ export class TeltonikaPacketsParser {
       // if (crc != calculateCRC(data))
       //   throw new Error('CRC does not match the expected.');
 
-      return this.process(codecId);
+      // We need to advance the point until we encounter the id
+      // with the result of that, we can destruct the id value
+      // this._reader.readInt32(); // data size record
+      // const codec_id = convertBytesToInt(this._reader.readBytes(1));
+      this._reader = new BinaryReader(this._buff);
+      console.log(this._reader.readBytes(9));
+      this._codec = this._getRequiredCodec(codecId);
+      this._tcpTeltonikaPacket.body = this._codec.decode();
+      console.log(this._tcpTeltonikaPacket);
+      return this._tcpTeltonikaPacket;
     }
     return null;
   }
@@ -97,30 +99,10 @@ export class TeltonikaPacketsParser {
       imei,
       codecId,
     });
-
-    const dataSize1 = convertBytesToInt(this._reader.readBytes(1));
-    for (let i = 0; i < dataSize1; i++) {
-      let avlRecord = {
-        timestamp: new Date(convertBytesToInt(this._reader.readBytes(8))),
-        priority: convertBytesToInt(this._reader.readBytes(1)),
-        gps: {
-          longitude: this._reader.readInt32(),
-          latitude: this._reader.readInt32(),
-          altitude: this._reader.readInt16(),
-          angle: this._reader.readInt16(),
-          satellites: this._reader.readInt8(),
-          speed: this._reader.readInt16(),
-        },
-        event_id: convertBytesToInt(this._reader.readBytes(1)),
-        properties_count: convertBytesToInt(this._reader.readBytes(1)),
-        ioElements: [],
-      };
-      avlRecord = sanitizeGPS(avlRecord, 1000000);
-      avlRecord.ioElements = this._parseIoElements();
-      console.log(avlRecord);
-    }
-    const dataSize2 = convertBytesToInt(this._reader.readBytes(1));
-    console.log({ dataSize2 });
+    this._codec = this._getRequiredCodec(codecId);
+    const p = this._codec.decode();
+    console.log(p);
+    // const dataSize1 = convertBytesToInt(this._reader.readBytes(1));
   }
 
   private checkIsImei() {
@@ -134,78 +116,26 @@ export class TeltonikaPacketsParser {
       convertBytesToInt(this._reader.readBytes(2));
     }
   }
-
-  private _parseIoElements() {
-    const ioElement = [];
-    const ioCountInt8 = convertBytesToInt(this._reader.readBytes(1));
-    for (let i = 0; i < ioCountInt8; i++) {
-      const property_id = convertBytesToInt(this._reader.readBytes(1));
-      const value = convertBytesToInt(this._reader.readBytes(1));
-      ioElement.push(prepareIOEntity(property_id, value, Codec8IoElements));
-    }
-
-    const ioCountInt16 = convertBytesToInt(this._reader.readBytes(1));
-    for (let i = 0; i < ioCountInt16; i++) {
-      const property_id = convertBytesToInt(this._reader.readBytes(1));
-      const value = this._reader.readInt16();
-      ioElement.push(prepareIOEntity(property_id, value, Codec8IoElements));
-    }
-
-    const ioCountInt32 = convertBytesToInt(this._reader.readBytes(1));
-    for (let i = 0; i < ioCountInt32; i++) {
-      const property_id = convertBytesToInt(this._reader.readBytes(1));
-      const value = this._reader.readInt32();
-      ioElement.push(prepareIOEntity(property_id, value, Codec8IoElements));
-    }
-
-    const ioCountInt64 = convertBytesToInt(this._reader.readBytes(1));
-    for (let i = 0; i < ioCountInt64; i++) {
-      const property_id = convertBytesToInt(this._reader.readBytes(1));
-      const value = this._reader.readDouble();
-      ioElement.push(prepareIOEntity(property_id, value, Codec8IoElements));
-    }
-
-    return ioElement;
-  }
-  private process(codecId) {
-    // We need to advance the point until we encounter the id
-    // with the result of that, we can destruct the id value
-    // this._reader.readInt32(); // data size record
-    // const codec_id = convertBytesToInt(this._reader.readBytes(1));
-    this._reader = new BinaryReader(this._buff);
-    console.log(this._reader.readBytes(9));
+  private _getRequiredCodec(codecId): BaseCodec {
     switch (codecId) {
       case 8:
-        this._codec = new Codec8(this._reader);
-        break;
+        return new Codec8(this._reader);
       case 142:
-        this._codec = new Codec8ex(this._reader);
-        break;
-      case 16:
-        this._codec = new Codec16(this._reader);
-        break;
-      case 12:
-        this._codec = new Codec12(this._reader);
-        break;
-      case 13:
-        this._codec = new Codec13(this._reader);
-        break;
-      case 14:
-        this._codec = new Codec14(this._reader);
-        break;
-    }
+        return new Codec8ex(this._reader);
 
-    this.tcpTeltonikaPacket.body = this._codec.decode();
-    console.log(this.tcpTeltonikaPacket);
-    return this.tcpTeltonikaPacket;
-  }
-  get codec() {
-    return this._codec;
-  }
-  set tcpTeltonikaPacket(value) {
-    this._tcpTeltonikaPacket = value;
-  }
-  get tcpTeltonikaPacket() {
-    return this._tcpTeltonikaPacket;
+      case 16:
+        return new Codec16(this._reader);
+
+      case 12:
+        return new Codec12(this._reader);
+
+      case 13:
+        return new Codec13(this._reader);
+
+      case 14:
+        return new Codec14(this._reader);
+      default:
+        throw new Error('Codec id does not match with any of available codecs');
+    }
   }
 }

@@ -64,7 +64,6 @@ export class Codec14 extends BaseCodec implements GprsCodecInterface {
     const parser = new TeltonikaPacketsParser(
       Buffer.from(responsePacket, 'hex'),
     );
-    console.log('Device response tcp packet: ', parser.tcpTeltonikaPacket);
   }
   decodeAvlPacket(): tcpCFCOGMPacketBody | Array<tcpCFDDSPacketBody> {
     const numberOfRecords1 = convertBytesToInt(this.reader.readBytes(1));
