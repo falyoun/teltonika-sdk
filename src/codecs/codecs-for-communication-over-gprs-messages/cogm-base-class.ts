@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from '@app/binary-data-handler';
-import { TcpCFCOGMPacketBody } from '@app/codecs';
+import { Command, TcpCFCOGMPacketBody } from '@app/codecs';
 
 export abstract class CogmBaseClass {
   protected constructor(
@@ -8,8 +8,5 @@ export abstract class CogmBaseClass {
   ) {}
 
   public abstract decode(): TcpCFCOGMPacketBody;
-
-  public abstract encode(
-    tcpCFCOGMPacketBody: TcpCFCOGMPacketBody,
-  ): TcpCFCOGMPacketBody;
+  public abstract encode(command: Command): Buffer;
 }

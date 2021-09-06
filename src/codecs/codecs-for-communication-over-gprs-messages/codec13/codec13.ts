@@ -3,7 +3,7 @@
  * Main differences of Codec13 are that timestamp is using in messages and communication is one way only (Codec13 is used for Device -> Server sending).
  */
 import { convertBytesToInt, convertHexToAscii } from '@app/utils';
-import { TcpCFCOGMPacketBody, TcpCFDDSPacketBody } from '@app/codecs';
+import { Command, TcpCFCOGMPacketBody } from '@app/codecs';
 import { CogmBaseClass } from '../cogm-base-class';
 
 export class Codec13 extends CogmBaseClass {
@@ -37,7 +37,14 @@ export class Codec13 extends CogmBaseClass {
     return body;
   }
 
-  encode(tcpCFCOGMPacketBody: TcpCFCOGMPacketBody): TcpCFCOGMPacketBody {
-    return undefined;
+  public encode(command: Command): Buffer {
+    this.writer.writeInt32(13);
+    this.writer.writeInt32(1); // Command count
+    this.writer.writeInt32(command.id);
+    this.writer.writeInt32(command.data.length);
+    this.writer.writeBytes(command.data);
+    this.writer.writeInt32(1); // Command count
+    console.log(this.writer.byteBuffer);
+    return this.writer.byteBuffer;
   }
 }

@@ -1,4 +1,4 @@
-import { TcpCFCOGMPacketBody, TcpCFDDSPacketBody } from '@app/codecs';
+import { Command, TcpCFCOGMPacketBody } from '@app/codecs';
 import {
   convertAsciiToBinary,
   convertBytesToInt,
@@ -91,8 +91,14 @@ export class Codec14 extends CogmBaseClass {
     }
     return body;
   }
-
-  encode(tcpCFCOGMPacketBody: TcpCFCOGMPacketBody): TcpCFCOGMPacketBody {
-    return undefined;
+  public encode(command: Command): Buffer {
+    this.writer.writeInt32(14);
+    this.writer.writeInt32(1); // Command count
+    this.writer.writeInt32(command.id);
+    this.writer.writeInt32(command.data.length);
+    this.writer.writeBytes(command.data);
+    this.writer.writeInt32(1); // Command count
+    console.log(this.writer.byteBuffer);
+    return this.writer.byteBuffer;
   }
 }

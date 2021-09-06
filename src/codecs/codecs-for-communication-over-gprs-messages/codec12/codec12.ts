@@ -4,7 +4,7 @@
  * This protocol is also necessary for using FMB630/FM6300/FM5300/FM5500/FM4200 features like: Garmin, LCD communication, COM TCP Link Mode.
  */
 import { convertBytesToInt, convertHexToAscii } from '@app/utils';
-import { TcpCFCOGMPacketBody } from '@app/codecs';
+import { Command, TcpCFCOGMPacketBody } from '@app/codecs';
 import { CogmBaseClass } from '../cogm-base-class';
 
 export class Codec12 extends CogmBaseClass {
@@ -45,9 +45,18 @@ export class Codec12 extends CogmBaseClass {
     }
     return body;
   }
-  public encode(tcpCFCOGMPacketBody: TcpCFCOGMPacketBody): TcpCFCOGMPacketBody {
-    throw new Error('Method not implemented.');
+
+  public encode(command: Command): Buffer {
+    this.writer.writeInt32(12);
+    this.writer.writeInt32(1); // Command count
+    this.writer.writeInt32(command.id);
+    this.writer.writeInt32(command.data.length);
+    this.writer.writeBytes(command.data);
+    this.writer.writeInt32(1); // Command count
+    console.log(this.writer.byteBuffer);
+    return this.writer.byteBuffer;
   }
+
   constructor(reader, writer) {
     super(reader, writer);
   }

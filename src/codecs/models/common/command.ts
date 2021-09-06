@@ -1,4 +1,4 @@
 export class Command {
   id: number;
-  data: any;
+  data: Buffer;
 }
