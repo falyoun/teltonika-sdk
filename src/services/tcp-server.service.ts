@@ -1,10 +1,10 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import net from 'net';
 import { TeltonikaPacketsParser } from '@app/teltonika-packets-parser';
 
 @Injectable()
-export class TcpServerService implements OnModuleInit {
-  async onModuleInit() {
+export class TcpServerService {
+  initiateServer(): net.Server {
     const port = +process.env.TCP_PORT;
     const tcpServer = net.createServer((socket) => {
       socket

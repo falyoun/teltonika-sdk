@@ -1,6 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { UdpClientService, UdpServerService } from '@app/services';
+import {
+  TcpClientService,
+  UdpClientService,
+  UdpServerService,
+} from '@app/services';
 import { TcpServerService } from '@app/services/tcp-server.service';
 @Module({
   imports: [
@@ -17,9 +21,20 @@ import { TcpServerService } from '@app/services/tcp-server.service';
   ],
   controllers: [],
   providers: [
-    // TcpServerService,
+    TcpServerService,
+    TcpClientService,
     UdpServerService,
     UdpClientService,
   ],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(
+    private readonly tcpServerService: TcpServerService,
+    private readonly tcpClientService: TcpClientService,
+    private readonly udpServerService: UdpServerService,
+    private readonly udpClientService: UdpClientService,
+  ) {}
+  onModuleInit() {
+    this.tcpServerService.initiateServer();
+  }
+}

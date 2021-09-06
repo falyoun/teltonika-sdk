@@ -1,8 +1,9 @@
 import net from 'net';
-import { OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-export class TcpClientService implements OnModuleInit {
-  onModuleInit() {
+@Injectable()
+export class TcpClientService {
+  initiateClient() {
     const client = new net.Socket();
     const host = '127.0.0.1';
 

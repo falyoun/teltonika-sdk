@@ -1,9 +1,9 @@
 import udp from 'dgram';
-import { OnModuleInit } from '@nestjs/common';
-import { DecoderTypes, TeltonikaPacketsParser } from '@app/teltonika-packets-parser';
-
-export class UdpServerService implements OnModuleInit {
-  async onModuleInit() {
+import { TeltonikaPacketsParser } from '@app/teltonika-packets-parser';
+import { Injectable } from '@nestjs/common';
+@Injectable()
+export class UdpServerService {
+  initiateServer() {
     const server = udp.createSocket('udp4');
     // Emits whenever an error occurs
     server.on('error', (error) => {

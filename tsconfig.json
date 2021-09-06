@@ -24,6 +24,7 @@
     "allowJs": true,
     "strict": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "baseUrl": "./",
     "paths": {
       "@app/*": [

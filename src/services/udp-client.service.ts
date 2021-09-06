@@ -1,7 +1,8 @@
-import { OnModuleInit } from '@nestjs/common';
 import udp from 'dgram';
-export class UdpClientService implements OnModuleInit {
-  onModuleInit() {
+import { Injectable } from '@nestjs/common';
+@Injectable()
+export class UdpClientService {
+  initiateClient() {
     // creating a client socket
     const client = udp.createSocket('udp4');
     // buffer msg
