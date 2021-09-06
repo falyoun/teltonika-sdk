@@ -1,8 +1,8 @@
 import { convertBytesToInt } from '@app/utils';
-import { BaseCodec } from '../../base-codec';
-import { tcpCFCOGMPacketBody, tcpCFDDSPacketBody } from '@app/codecs';
+import { DdsBaseClass } from '../dds-base-class';
+import { TcpCFDDSPacketBody } from '@app/codecs';
 
-export class Codec16 extends BaseCodec {
+export class Codec16 extends DdsBaseClass {
   constructor(reader) {
     super(reader);
   }
@@ -41,9 +41,9 @@ export class Codec16 extends BaseCodec {
     return ioElement;
   }
 
-  decodeAvlPacket(): tcpCFCOGMPacketBody | Array<tcpCFDDSPacketBody> {
+  decodeAvlPacket(): Array<TcpCFDDSPacketBody> {
     const numberOfRecords1 = convertBytesToInt(this.reader.readBytes(1));
-    const body = [] as tcpCFDDSPacketBody[];
+    const body = [] as TcpCFDDSPacketBody[];
     for (let i = 0; i < numberOfRecords1; i++) {
       const avlRecord: any = {};
       avlRecord.timestamp = new Date(

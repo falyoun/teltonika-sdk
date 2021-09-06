@@ -1,27 +1,24 @@
 import { convertBytesToInt, prepareIOEntity, sanitizeGPS } from '@app/utils';
 import {
-  BaseCodec,
+  DdsBaseClass,
   Codec12,
   Codec13,
   Codec14,
   Codec16,
   Codec8,
   Codec8ex,
-  Codec8IoElements,
   CodecsTypesEnum,
   TcpTeltonikaPacket,
+  CogmBaseClass,
 } from '@app/codecs';
-import { BinaryReader } from '@app/binary-data-handler';
+import { BinaryReader, BinaryWriter } from '@app/binary-data-handler';
 
-export enum DecoderTypes {
-  UDP_DECODER = 'udp_decoder',
-  TCP_DECODER = 'tcp_decoder',
-}
 export class TeltonikaPacketsParser {
   private _reader: BinaryReader;
+  private _writer: BinaryWriter;
   private isImei = false;
   private imei: any;
-  private _codec: BaseCodec;
+  private _codec: DdsBaseClass | CogmBaseClass;
   private _tcpTeltonikaPacket: TcpTeltonikaPacket;
   private _udpPacket: {
     header: any;
@@ -32,6 +29,7 @@ export class TeltonikaPacketsParser {
   constructor(buffer) {
     this._buff = buffer;
     this._reader = new BinaryReader(buffer);
+    this._writer = new BinaryWriter();
   }
   decodeTcpData() {
     // this.checkIsImei();
@@ -41,13 +39,9 @@ export class TeltonikaPacketsParser {
       const length = this._reader.readInt32(); // convertBytesToInt(this._reader.readBytes(4));
       const codecId = convertBytesToInt(this._reader.readBytes(1));
       if (codecId === 8 || codecId === 142 || codecId === 16) {
-        this._tcpTeltonikaPacket = new TcpTeltonikaPacket(
-          CodecsTypesEnum.DEVICE_DATA_SENDING_CODEC,
-        );
+        this._tcpTeltonikaPacket = new TcpTeltonikaPacket();
       } else {
-        this._tcpTeltonikaPacket = new TcpTeltonikaPacket(
-          CodecsTypesEnum.COMMUNICATION_OVER_GPRS_CODEC,
-        );
+        this._tcpTeltonikaPacket = new TcpTeltonikaPacket();
       }
       this._tcpTeltonikaPacket.header = {
         preamble,
@@ -76,7 +70,11 @@ export class TeltonikaPacketsParser {
       this._reader = new BinaryReader(this._buff);
       console.log(this._reader.readBytes(9));
       this._codec = this._getRequiredCodec(codecId);
-      this._tcpTeltonikaPacket.body = this._codec.decode();
+      if (this._codec instanceof DdsBaseClass) {
+        this._tcpTeltonikaPacket.body = this._codec.decode();
+      } else {
+        // TODO("Un-implemented flow")
+      }
       console.log(this._tcpTeltonikaPacket);
       return this._tcpTeltonikaPacket;
     }
@@ -116,7 +114,7 @@ export class TeltonikaPacketsParser {
       convertBytesToInt(this._reader.readBytes(2));
     }
   }
-  private _getRequiredCodec(codecId): BaseCodec {
+  private _getRequiredCodec(codecId): DdsBaseClass | CogmBaseClass {
     switch (codecId) {
       case 8:
         return new Codec8(this._reader);
@@ -127,13 +125,13 @@ export class TeltonikaPacketsParser {
         return new Codec16(this._reader);
 
       case 12:
-        return new Codec12(this._reader);
+        return new Codec12(this._reader, this._writer);
 
       case 13:
-        return new Codec13(this._reader);
+        return new Codec13(this._reader, this._writer);
 
       case 14:
-        return new Codec14(this._reader);
+        return new Codec14(this._reader, this._writer);
       default:
         throw new Error('Codec id does not match with any of available codecs');
     }

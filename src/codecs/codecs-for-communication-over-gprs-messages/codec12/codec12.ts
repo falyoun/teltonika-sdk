@@ -3,25 +3,14 @@
  * Codec12 GPRS commands can be used for sending configuration, debug, digital outputs control commands or other (special purpose command on special firmware versions).
  * This protocol is also necessary for using FMB630/FM6300/FM5300/FM5500/FM4200 features like: Garmin, LCD communication, COM TCP Link Mode.
  */
-import {
-  checkCodecType,
-  convertBytesToInt,
-  convertHexToAscii,
-} from '@app/utils';
-import {
-  BaseCodec,
-  tcpCFCOGMPacketBody,
-  tcpCFDDSPacketBody,
-} from '@app/codecs';
+import { convertBytesToInt, convertHexToAscii } from '@app/utils';
+import { TcpCFCOGMPacketBody } from '@app/codecs';
+import { CogmBaseClass } from '../cogm-base-class';
 
-export class Codec12 extends BaseCodec {
-  constructor(reader) {
-    super(reader);
-  }
-
-  decodeAvlPacket(): tcpCFCOGMPacketBody | Array<tcpCFDDSPacketBody> {
+export class Codec12 extends CogmBaseClass {
+  public decode(): TcpCFCOGMPacketBody {
     const numberOfRecords1 = convertBytesToInt(this.reader.readBytes(1));
-    let body = {} as tcpCFCOGMPacketBody;
+    let body = {} as TcpCFCOGMPacketBody;
     for (let i = 0; i < numberOfRecords1; i++) {
       const commandType = convertBytesToInt(this.reader.readBytes(1));
       if (commandType === 5) {
@@ -55,5 +44,11 @@ export class Codec12 extends BaseCodec {
       }
     }
     return body;
+  }
+  public encode(tcpCFCOGMPacketBody: TcpCFCOGMPacketBody): TcpCFCOGMPacketBody {
+    throw new Error('Method not implemented.');
+  }
+  constructor(reader, writer) {
+    super(reader, writer);
   }
 }

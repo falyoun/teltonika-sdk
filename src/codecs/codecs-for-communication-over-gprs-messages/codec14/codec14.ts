@@ -1,24 +1,20 @@
-import {
-  BaseCodec,
-  GprsCodecInterface,
-  tcpCFCOGMPacketBody,
-  tcpCFDDSPacketBody,
-} from '@app/codecs';
+import { TcpCFCOGMPacketBody, TcpCFDDSPacketBody } from '@app/codecs';
 import {
   convertAsciiToBinary,
   convertBytesToInt,
   convertHexToAscii,
 } from '@app/utils';
 import { TeltonikaPacketsParser } from '@app/teltonika-packets-parser';
+import { CogmBaseClass } from '../cogm-base-class';
 
 /**
  * Codec14 is original Teltonika protocol for device-server communication over GPRS messages and it is based on Codec12 protocol.
  * Main difference of Codec14 is that, device will answer to GPRS command if device physical IMEI number matches specified IMEI number in GPRS command.
  * Codec14 GPRS commands can be used for sending configuration, debug, digital outputs control commands or other (special purpose command on special firmware versions).
  */
-export class Codec14 extends BaseCodec implements GprsCodecInterface {
-  constructor(reader) {
-    super(reader);
+export class Codec14 extends CogmBaseClass {
+  constructor(reader, writer) {
+    super(reader, writer);
   }
 
   sendCommand(command: string) {
@@ -65,9 +61,10 @@ export class Codec14 extends BaseCodec implements GprsCodecInterface {
       Buffer.from(responsePacket, 'hex'),
     );
   }
-  decodeAvlPacket(): tcpCFCOGMPacketBody | Array<tcpCFDDSPacketBody> {
+
+  decode(): TcpCFCOGMPacketBody {
     const numberOfRecords1 = convertBytesToInt(this.reader.readBytes(1));
-    let body = {} as tcpCFCOGMPacketBody;
+    let body = {} as TcpCFCOGMPacketBody;
     for (let i = 0; i < numberOfRecords1; i++) {
       const messageType = convertBytesToInt(this.reader.readBytes(1));
       // 0x06(6 in decimal) (if it is ACK) or 0x11(17 in decimal) (if it is nACK)
@@ -93,5 +90,9 @@ export class Codec14 extends BaseCodec implements GprsCodecInterface {
       }
     }
     return body;
+  }
+
+  encode(tcpCFCOGMPacketBody: TcpCFCOGMPacketBody): TcpCFCOGMPacketBody {
+    return undefined;
   }
 }

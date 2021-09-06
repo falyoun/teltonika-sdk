@@ -1,14 +1,14 @@
 // Codec For Communication Over Gprs Messages
-import { AvlData, CodecsTypesEnum, GpsElement, IoElement } from '@app/codecs';
+import { AvlData } from '@app/codecs';
 
-export class tcpCFCOGMPacketBody {
+export class TcpCFCOGMPacketBody {
   commandType: number;
   commandSize: number;
   command: string;
 }
 
 // Codec For Device Data Sending
-export class tcpCFDDSPacketBody {
+export class TcpCFDDSPacketBody {
   public numberOfRecords1: number;
   public codecId: number;
   public avlData: AvlData;
@@ -31,14 +31,10 @@ export class TcpPacketFooter {
 }
 export class TcpTeltonikaPacket {
   header: TcpPacketHeader;
-  body: tcpCFCOGMPacketBody | Array<tcpCFDDSPacketBody>;
+  body: Array<TcpCFDDSPacketBody>;
   footer: TcpPacketFooter;
-  constructor(codecType: CodecsTypesEnum) {
-    if (codecType === CodecsTypesEnum.DEVICE_DATA_SENDING_CODEC) {
-      this.body = new Array<tcpCFDDSPacketBody>();
-    } else {
-      this.body = new tcpCFCOGMPacketBody();
-    }
+  constructor() {
+    this.body = new Array<TcpCFDDSPacketBody>();
     this.header = new TcpPacketHeader();
     this.footer = new TcpPacketFooter();
   }

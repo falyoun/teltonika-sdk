@@ -1,7 +1,7 @@
-import { Codec8extendedIoElements, tcpCFDDSPacketBody } from '@app/codecs';
+import { Codec8extendedIoElements, TcpCFDDSPacketBody } from '@app/codecs';
 import { convertBytesToInt, prepareIOEntity, sanitizeGPS } from '@app/utils';
-import { BaseCodec } from '../../base-codec';
-export class Codec8ex extends BaseCodec {
+import { DdsBaseClass } from '../dds-base-class';
+export class Codec8ex extends DdsBaseClass {
   _gpsPrecision: any;
   constructor(reader) {
     super(reader);
@@ -10,7 +10,7 @@ export class Codec8ex extends BaseCodec {
 
   decodeAvlPacket() {
     const numberOfRecords1 = convertBytesToInt(this.reader.readBytes(1));
-    const body = [] as tcpCFDDSPacketBody[];
+    const body = [] as TcpCFDDSPacketBody[];
     for (let i = 0; i < numberOfRecords1; i++) {
       let avlRecord = {
         timestamp: new Date(convertBytesToInt(this.reader.readBytes(8))),
